@@ -6,13 +6,13 @@ import (
 	"github.com/Edilberto-Vazquez/game-shop-services/session/models"
 )
 
-type Repository interface {
+type SessionRepository interface {
 	InsertUser(ctx context.Context, user *models.User) error
 }
 
-var implementation Repository
+var implementation SessionRepository
 
-func SetRepository(repository Repository) {
+func SetRepository(repository SessionRepository) {
 	implementation = repository
 }
 
