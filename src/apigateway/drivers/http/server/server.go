@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log"
 
+	"github.com/Edilberto-Vazquez/game-shop-services/src/apigateway/drivers/http/services"
 	"github.com/gin-gonic/gin"
 )
 
@@ -14,15 +15,21 @@ type Config struct {
 
 type Server interface {
 	Config() *Config
+	Services() *services.Services
 }
 
 type Broker struct {
-	config *Config
-	router *gin.Engine
+	config   *Config
+	router   *gin.Engine
+	services *services.Services
 }
 
 func (b *Broker) Config() *Config {
 	return b.config
+}
+
+func (b *Broker) Services() *services.Services {
+	return b.services
 }
 
 func NewServer(ctx context.Context, config *Config) (*Broker, error) {
@@ -31,7 +38,8 @@ func NewServer(ctx context.Context, config *Config) (*Broker, error) {
 	}
 
 	broker := &Broker{
-		config: config,
+		config:   config,
+		services: services.NewServices(),
 	}
 	return broker, nil
 }

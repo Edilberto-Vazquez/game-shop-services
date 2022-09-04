@@ -1,11 +1,9 @@
 package config
 
 import (
-	"log"
 	"os"
 
-	"github.com/Edilberto-Vazquez/game-shop-services/session/constants"
-	"github.com/joho/godotenv"
+	"github.com/Edilberto-Vazquez/game-shop-services/src/user/constants"
 )
 
 type DBConfig struct {
@@ -14,12 +12,10 @@ type DBConfig struct {
 	URI        string
 }
 
-func Config() DBConfig {
-	if err := godotenv.Load(); err != nil {
-		log.Fatal(err)
-	}
+func MongoConfig() DBConfig {
+	prefix := SetEnvironment()
 
-	uri := os.Getenv("MONGODB_URI")
+	uri := os.Getenv(prefix + "MONGODB_URI")
 
 	return DBConfig{
 		Name:       constants.DB_NAME,
