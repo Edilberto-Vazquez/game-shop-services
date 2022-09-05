@@ -5,34 +5,51 @@ import (
 	"log"
 
 	"github.com/Edilberto-Vazquez/game-shop-services/src/user/config"
-	"github.com/Edilberto-Vazquez/game-shop-services/src/user/models"
+	"github.com/Edilberto-Vazquez/game-shop-services/src/user/domains"
+	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-type MongoDB struct {
+type MongoRepository struct {
+	db   *mongo.Database
 	coll *mongo.Collection
 }
 
-func NewMongoDB(conf config.DBConfig) *MongoDB {
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(conf.URI))
-	collection := client.Database(conf.Name).Collection(conf.Collection)
-	if err != nil {
-		log.Fatal(err)
-	}
-	return &MongoDB{collection}
+type mongoUser struct {
+	ID        uuid.UUID `bson:"id"`
+	UserName  string    `bson:"user_name"`
+	Email     string    `bson:"email"`
+	CountryId string    `bson:"country_id"`
+	Salt      string    `bson:"salt"`
+	Hash      string    `bson:"hash"`
 }
 
-func (mongo *MongoDB) InsertUser(ctx context.Context, user *models.User) (userId string, err error) {
-	doc := bson.D{
-		{Key: "user_name", Value: user.UserName},
-		{Key: "email", Value: user.Email},
-		{Key: "country_id", Value: user.CountryId},
-		{Key: "salt", Value: user.Salt},
-		{Key: "hash", Value: user.Hash},
+func NewFromUser(user domains.User) mongoUser {
+	return mongoUser{
+		ID:        user.GetID(),
+		UserName:  user.GetUserName(),
+		Email:     user.GetEmail(),
+		CountryId: user.GetCountryId(),
+		Salt:      user.GetSalt(),
+		Hash:      user.GetHash(),
 	}
+}
+
+func NewMongoRepository(conf config.DBConfig) (*MongoRepository, error) {
+	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(conf.URI))
+	if err != nil {
+		return nil, err
+	}
+	db := client.Database(conf.Name)
+	coll := db.Collection(conf.Collection)
+	return &MongoRepository{db: db, coll: coll}, nil
+}
+
+func (mongo *MongoRepository) InsertUser(ctx context.Context, user domains.User) (userId string, err error) {
+	doc := NewFromUser(user)
 	result, err := mongo.coll.InsertOne(ctx, doc)
 	if err != nil {
 		log.Printf("Drivers(InsertUser): %v", err)
@@ -42,45 +59,28 @@ func (mongo *MongoDB) InsertUser(ctx context.Context, user *models.User) (userId
 	return
 }
 
-func (mongo *MongoDB) FindUser(ctx context.Context, userId string) (user *models.User, err error) {
-	id, err := primitive.ObjectIDFromHex(userId)
-	if err != nil {
-		log.Printf("Drivers(FindUser): %v", err)
-		return nil, err
-	}
-	filter := bson.D{{Key: "_id", Value: id}}
+func (mongo *MongoRepository) FindUser(ctx context.Context, userID uuid.UUID) (user domains.User, err error) {
+	filter := bson.D{{Key: "_id", Value: userID}}
 	err = mongo.coll.FindOne(ctx, filter).Decode(&user)
 	if err != nil {
-		return nil, err
+		return domains.User{}, err
 	}
 	return
 }
 
-func (mongo *MongoDB) UpdateUser(ctx context.Context, user *models.User) (err error) {
-	id, err := primitive.ObjectIDFromHex(user.Id)
-	if err != nil {
-		log.Printf("Drivers(Updateuser): %v", err)
-		return err
-	}
-	filter := bson.D{{Key: "_id", Value: id}}
-	doc := bson.D{
-		{Key: "user_name", Value: user.UserName},
-		{Key: "email", Value: user.Email},
-		{Key: "country_id", Value: user.CountryId},
-		{Key: "salt", Value: user.Salt},
-		{Key: "hash", Value: user.Hash},
-	}
+func (mongo *MongoRepository) UpdateUser(ctx context.Context, user domains.User) (err error) {
+	filter := bson.D{{Key: "_id", Value: user.GetID()}}
+	doc := NewFromUser(user)
 	_, err = mongo.coll.UpdateOne(ctx, filter, doc)
 	return
 }
 
-func (mongo *MongoDB) DeleteUser(ctx context.Context, userId string) (err error) {
-	id, err := primitive.ObjectIDFromHex(userId)
+func (mongo *MongoRepository) DeleteUser(ctx context.Context, userID uuid.UUID) (err error) {
 	if err != nil {
 		log.Printf("Drivers(Deleteuser): %v", err)
 		return err
 	}
-	doc := bson.D{{Key: "_id", Value: id}}
+	doc := bson.D{{Key: "_id", Value: userID}}
 	_, err = mongo.coll.DeleteOne(ctx, doc)
 	return
 }

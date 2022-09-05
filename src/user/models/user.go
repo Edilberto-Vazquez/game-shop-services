@@ -1,22 +1,12 @@
 package models
 
-type Login struct {
-	UserName string `json:"userName"`
-}
+import "github.com/google/uuid"
 
-type SignUp struct {
-	UserName  string `json:"userName" binding:"required"`
-	Email     string `json:"email" binding:"required"`
-	CountryId string `json:"countryId" binding:"required"`
-	Salt      string `json:"salt" binding:"required"`
-	Hash      string `json:"hash" binding:"required"`
-}
-
-type User struct {
-	Id        string `json:"id"`
-	UserName  string `json:"userName"`
-	Email     string `json:"email"`
-	CountryId string `json:"countryId"`
-	Salt      string `json:"salt"`
-	Hash      string `json:"hash"`
+type Person struct {
+	ID        uuid.UUID `json:"id"`
+	UserName  string    `json:"userName" validate:"required" binding:"required"`
+	Email     string    `json:"email" validate:"required" binding:"required"`
+	CountryId string    `json:"countryId" validate:"required" binding:"required"`
+	Salt      string    `json:"salt" validate:"required" binding:"required"`
+	Hash      string    `json:"hash" validate:"required" binding:"required"`
 }

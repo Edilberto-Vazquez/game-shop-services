@@ -32,14 +32,13 @@ func (b *Broker) Services() *services.Services {
 	return b.services
 }
 
-func NewServer(ctx context.Context, config *Config) (*Broker, error) {
+func NewServer(ctx context.Context, config *Config, services *services.Services) (*Broker, error) {
 	if config.Port == "" {
 		return nil, errors.New("port is required")
 	}
-
 	broker := &Broker{
 		config:   config,
-		services: services.NewServices(),
+		services: services,
 	}
 	return broker, nil
 }

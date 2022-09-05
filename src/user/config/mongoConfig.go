@@ -12,7 +12,7 @@ type DBConfig struct {
 	URI        string
 }
 
-func MongoConfig() DBConfig {
+func NewMongoConfig() DBConfig {
 	prefix := SetEnvironment()
 
 	uri := os.Getenv(prefix + "MONGODB_URI")

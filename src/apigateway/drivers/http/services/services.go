@@ -1,13 +1,15 @@
 package services
 
-import "github.com/Edilberto-Vazquez/game-shop-services/src/user"
+import (
+	"github.com/Edilberto-Vazquez/game-shop-services/src/user/usecases"
+)
 
 type Services struct {
-	UserService user.UserService
+	SessionService *usecases.SessionService
 }
 
 func NewServices() *Services {
 	return &Services{
-		UserService: *user.NewUserService(),
+		SessionService: usecases.NewSessionService(usecases.WithMongoUserRepository()),
 	}
 }

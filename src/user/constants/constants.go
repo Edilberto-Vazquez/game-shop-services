@@ -2,5 +2,5 @@ package constants
 
 const (
 	DB_NAME         = "game-shop"
-	COLLECTION_NAME = "session"
+	COLLECTION_NAME = "users"
 )
