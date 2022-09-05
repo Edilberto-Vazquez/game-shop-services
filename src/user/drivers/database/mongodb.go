@@ -59,8 +59,8 @@ func (mongo *MongoRepository) InsertUser(ctx context.Context, user domains.User)
 	return
 }
 
-func (mongo *MongoRepository) FindUser(ctx context.Context, userID uuid.UUID) (user domains.User, err error) {
-	filter := bson.D{{Key: "_id", Value: userID}}
+func (mongo *MongoRepository) FindUser(ctx context.Context, userName string) (user domains.User, err error) {
+	filter := bson.D{{Key: "userName", Value: userName}}
 	err = mongo.coll.FindOne(ctx, filter).Decode(&user)
 	if err != nil {
 		return domains.User{}, err

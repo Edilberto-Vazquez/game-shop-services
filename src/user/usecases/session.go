@@ -47,3 +47,8 @@ func (ss *SessionService) SignUp(ctx context.Context, user *models.Person) (uuid
 	ss.users.InsertUser(ctx, u)
 	return u.GetID(), nil
 }
+
+func (ss *SessionService) Login(ctx context.Context, userName string) (string, error) {
+	ss.users.FindUser(ctx, userName)
+	return userName, nil
+}

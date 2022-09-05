@@ -10,7 +10,8 @@ import (
 )
 
 type Config struct {
-	Port string
+	Port      string
+	JWTSecret string
 }
 
 type Server interface {
