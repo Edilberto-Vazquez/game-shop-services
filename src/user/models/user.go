@@ -1,12 +1,17 @@
 package models
 
-import "github.com/google/uuid"
+import "time"
+
+type Paranoid struct {
+	CreatedAt time.Time `json:"created_at,omitempty"`
+	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	DeletedAt time.Time `json:"deleted_at,omitempty"`
+}
 
 type Person struct {
-	ID        uuid.UUID `json:"id"`
-	UserName  string    `json:"userName" validate:"required" binding:"required"`
-	Email     string    `json:"email" validate:"required" binding:"required"`
-	CountryId string    `json:"countryId" validate:"required" binding:"required"`
-	Salt      string    `json:"salt" validate:"required" binding:"required"`
-	Hash      string    `json:"hash" validate:"required" binding:"required"`
+	ID        string `json:"id"`
+	UserName  string `json:"userName" validate:"required"`
+	Email     string `json:"email" validate:"required"`
+	CountryId string `json:"countryId" validate:"required"`
+	Password  string `json:"password" validate:"required"`
 }

@@ -5,11 +5,11 @@ import (
 )
 
 type Services struct {
-	SessionService *usecases.SessionService
+	SessionService *usecases.Session
 }
 
 func NewServices() *Services {
 	return &Services{
-		SessionService: usecases.NewSessionService(usecases.WithMongoUserRepository()),
+		SessionService: usecases.NewSession(usecases.WithMongoUserRepository()),
 	}
 }

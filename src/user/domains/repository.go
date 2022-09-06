@@ -3,12 +3,13 @@ package domains
 import (
 	"context"
 
-	"github.com/google/uuid"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type UserRepository interface {
-	InsertUser(ctx context.Context, user User) (userId string, err error)
-	FindUser(ctx context.Context, userId string) (user User, err error)
+	InsertUser(ctx context.Context, user User) (id string, err error)
+	FindUserById(ctx context.Context, id primitive.ObjectID) (user User, err error)
+	FindUserByEmail(ctx context.Context, email string) (user User, err error)
 	UpdateUser(ctx context.Context, user User) (err error)
-	DeleteUser(ctx context.Context, userId uuid.UUID) (err error)
+	DeleteUser(ctx context.Context, id primitive.ObjectID) (err error)
 }
