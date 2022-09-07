@@ -1,19 +1,10 @@
-package domains
-
-import (
-	"github.com/Edilberto-Vazquez/game-shop-services/src/user/models"
-	"github.com/go-playground/validator/v10"
-)
-
-var (
-	validate *validator.Validate
-)
+package user
 
 type User struct {
-	person *models.Person
+	person *Person
 }
 
-func NewUser(user *models.Person) User {
+func NewUser(user *Person) User {
 	return User{
 		person: user,
 	}

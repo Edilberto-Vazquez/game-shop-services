@@ -3,8 +3,8 @@ package utils
 import (
 	"strings"
 
-	"github.com/Edilberto-Vazquez/game-shop-services/src/apigateway/drivers/http/models"
 	"github.com/Edilberto-Vazquez/game-shop-services/src/apigateway/drivers/http/server"
+	"github.com/Edilberto-Vazquez/game-shop-services/src/user"
 	"github.com/golang-jwt/jwt/v4"
 )
 
@@ -19,8 +19,8 @@ func RouteNeedToken(route string, NO_AUTH_NEEDED []string) bool {
 
 func ProcessToken(authorization string, s server.Server) (*jwt.Token, error) {
 	tokenString := strings.TrimSpace(authorization)
-	token, err := jwt.ParseWithClaims(tokenString, &models.AppClaims{}, func(t *jwt.Token) (interface{}, error) {
-		return []byte(s.Config().JWTSecret), nil
+	token, err := jwt.ParseWithClaims(tokenString, &user.AppClaims{}, func(t *jwt.Token) (interface{}, error) {
+		return []byte(s.Services().SessionService.JWTSecret), nil
 	})
 	return token, err
 }
