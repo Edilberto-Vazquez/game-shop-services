@@ -45,15 +45,15 @@ func NewMongoDBRepository(conf Config) (*MongoDBRepository, error) {
 	return &MongoDBRepository{db: db, coll: coll}, nil
 }
 
-func (mongo *MongoDBRepository) InsertUser(ctx context.Context, user User) (id string, err error) {
+func (mongo *MongoDBRepository) InsertUser(ctx context.Context, user User) (err error) {
 	doc := NewFromUser(user)
 	doc.UpdatedAt = time.Now()
 	doc.Id = primitive.NewObjectID()
 	result, err := mongo.coll.InsertOne(ctx, doc)
 	if err != nil {
-		return "", err
+		return err
 	}
-	id = result.InsertedID.(primitive.ObjectID).Hex()
+	user.SetID(result.InsertedID.(primitive.ObjectID).Hex())
 	return
 }
 
@@ -67,11 +67,11 @@ func (mongo *MongoDBRepository) FindUserById(ctx context.Context, id primitive.O
 }
 
 func (mongo *MongoDBRepository) FindUserByEmail(ctx context.Context, email string) (user User, err error) {
-	filter := bson.M{"email": email}
+	filter := bson.M{"email": email, "deleted_at": bson.M{"$exists": false}}
 	var person Person
 	err = mongo.coll.FindOne(ctx, filter).Decode(&person)
 	if err != nil {
-		return User{}, err
+		return user, err
 	}
 	user = NewUser(&person)
 	return

@@ -30,7 +30,34 @@ type Login struct {
 	Password string `json:"password" validate:"required"`
 }
 
+type Response interface {
+	StatusCode() int
+	Error() error
+}
+
+type SignUpResponse struct {
+	Code int   `json:"statusCode"`
+	Err  error `json:"error"`
+}
+
+func (sr SignUpResponse) StatusCode() int {
+	return sr.Code
+}
+
+func (sr SignUpResponse) Error() error {
+	return sr.Err
+}
+
 type LoginResponse struct {
-	Email string `json:"email"`
 	Token string `json:"token"`
+	Code  int    `json:"statusCode"`
+	Err   error  `json:"error"`
+}
+
+func (lr LoginResponse) StatusCode() int {
+	return lr.Code
+}
+
+func (lr LoginResponse) Error() error {
+	return lr.Err
 }

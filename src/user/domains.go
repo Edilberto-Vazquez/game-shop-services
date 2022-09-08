@@ -49,3 +49,18 @@ func (u *User) GetPassword() string {
 func (u *User) SetPassword(password string) {
 	u.person.Password = password
 }
+
+func (u User) ToSignUpResponse(statusCode int, err error) SignUpResponse {
+	return SignUpResponse{
+		Code: statusCode,
+		Err:  err,
+	}
+}
+
+func (u User) ToLoginResponse(token string, statusCode int, err error) LoginResponse {
+	return LoginResponse{
+		Token: token,
+		Code:  statusCode,
+		Err:   err,
+	}
+}

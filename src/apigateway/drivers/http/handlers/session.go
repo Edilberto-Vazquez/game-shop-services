@@ -21,11 +21,11 @@ func SignUp(s server.Server) gin.HandlerFunc {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		if userId, err := services.SessionService.SignUp(ctx, &signup); err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		if user := services.SessionService.SignUp(ctx, signup); user.Error() != nil {
+			ctx.JSON(user.StatusCode(), user)
 			return
 		} else {
-			ctx.JSON(http.StatusOK, gin.H{"user": userId})
+			ctx.JSON(user.StatusCode(), user)
 		}
 	}
 }
@@ -38,11 +38,11 @@ func Login(s server.Server) gin.HandlerFunc {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		if login, err := services.SessionService.Login(ctx, login); err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		if user := services.SessionService.Login(ctx, login); user.Error() != nil {
+			ctx.JSON(user.StatusCode(), user)
 			return
 		} else {
-			ctx.JSON(http.StatusOK, gin.H{"login": login})
+			ctx.JSON(user.StatusCode(), user)
 			return
 		}
 	}

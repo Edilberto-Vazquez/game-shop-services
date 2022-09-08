@@ -2,8 +2,8 @@ package user
 
 import (
 	"context"
-	"errors"
 	"log"
+	"net/http"
 	"os"
 	"time"
 
@@ -49,32 +49,37 @@ func WithMongoUserRepository() SessionConfig {
 	}
 }
 
-func (ss *Session) SignUp(ctx context.Context, user *Person) (id string, err error) {
+func (ss *Session) SignUp(ctx context.Context, user Person) SignUpResponse {
+	newUser := NewUser(&user)
 	validate = validator.New()
-	err = validate.Struct(user)
+	err := validate.Struct(user)
 	if err != nil {
-		return "", errors.New("a user has to have a valid person")
+		return newUser.ToSignUpResponse(http.StatusBadRequest, err)
+	}
+	userWithMail, err := ss.users.FindUserByEmail(ctx, user.Email)
+	if err == nil || userWithMail.GetEmail() != "" {
+		return newUser.ToSignUpResponse(http.StatusBadRequest, err)
 	}
 	hashedPwd, err := HashPassword(user.Password)
 	if err != nil {
-		return "", err
+		return newUser.ToSignUpResponse(http.StatusInternalServerError, err)
 	}
 	user.Password = hashedPwd
-	id, err = ss.users.InsertUser(ctx, NewUser(user))
+	err = ss.users.InsertUser(ctx, newUser)
 	if err != nil {
-		return "", err
+		return newUser.ToSignUpResponse(http.StatusInternalServerError, err)
 	}
-	return id, nil
+	return newUser.ToSignUpResponse(http.StatusOK, nil)
 }
 
-func (ss *Session) Login(ctx context.Context, login Login) (LoginResponse, error) {
+func (ss *Session) Login(ctx context.Context, login Login) LoginResponse {
 	user, err := ss.users.FindUserByEmail(ctx, login.Email)
 	if err != nil {
-		return LoginResponse{}, err
+		return user.ToLoginResponse("", http.StatusBadRequest, err)
 	}
 	err = PasswordMatch(user.GetPassword(), login.Password)
 	if err != nil {
-		return LoginResponse{}, err
+		return user.ToLoginResponse("", http.StatusBadRequest, err)
 	}
 	claims := AppClaims{
 		UserEmail: user.GetEmail(),
@@ -85,10 +90,7 @@ func (ss *Session) Login(ctx context.Context, login Login) (LoginResponse, error
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString([]byte(ss.JWTSecret))
 	if err != nil {
-		return LoginResponse{}, err
+		return user.ToLoginResponse("", http.StatusInternalServerError, err)
 	}
-	return LoginResponse{
-		Email: user.GetEmail(),
-		Token: tokenString,
-	}, nil
+	return user.ToLoginResponse(tokenString, http.StatusOK, nil)
 }
