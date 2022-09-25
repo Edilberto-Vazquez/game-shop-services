@@ -1,0 +1,6 @@
+.env.example
+.gitignore
+docker-compose.yml
+LICENSE
+README.md
+docker-entrypoint-initdb.d

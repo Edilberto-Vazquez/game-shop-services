@@ -1,10 +1,7 @@
 package config
 
 import (
-	"log"
 	"os"
-
-	"github.com/joho/godotenv"
 )
 
 var (
@@ -12,9 +9,9 @@ var (
 )
 
 func SetEnvironment() {
-	if err := godotenv.Load(); err != nil {
-		log.Fatal(err)
-	}
+	// if err := godotenv.Load(); err != nil {
+	// 	log.Fatal(err)
+	// }
 	switch os.Getenv("GIN_MODE") {
 	case "release":
 		Env = ""

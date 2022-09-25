@@ -1,6 +1,16 @@
 version: "3.8"
 
 services:
+  game-shop:
+    container_name: game-shop
+    image: game-shop:latest
+    ports:
+      - 8000:8000
+    environment:
+      PORT: :8000
+      MONGODB_URI: mongodb://root:root@mongodb:27017/game-shop
+      SECRET: secret
+      GIN_MODE: release
   mongodb:
     container_name: mongodb
     image: mongo:latest
