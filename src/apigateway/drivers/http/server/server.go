@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 
 	"github.com/Edilberto-Vazquez/game-shop-services/src/apigateway/drivers/http/services"
@@ -47,10 +48,10 @@ func (b *Broker) Start(binder func(s Server, r *gin.Engine)) {
 	b.router = gin.Default()
 	b.router.SetTrustedProxies([]string{"127.0.0.1"})
 	binder(b, b.router)
-	log.Println("starting server on port", b.config.Port)
+	log.Println("[SERVER] starting server on port", b.config.Port)
 	if err := b.router.Run(b.config.Port); err != nil {
-		log.Println("error starting server:", err)
+		log.Println(fmt.Errorf("[SERVER] error starting server: %w", err))
 	} else {
-		log.Fatalf("server stopped")
+		log.Fatalf("[SERVER] server stopped")
 	}
 }

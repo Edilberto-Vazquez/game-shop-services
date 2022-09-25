@@ -7,8 +7,9 @@ import (
 )
 
 func sessionRoutes(s server.Server, rg *gin.RouterGroup) {
+	services := s.Services()
 	session := rg.Group("/session")
-	session.POST("/signup", handlers.SignUp(s))
-	session.GET("/login", handlers.Login(s))
-	session.GET("/me", handlers.Me(s))
+	session.POST("/signup", handlers.SignUp(services))
+	session.GET("/login", handlers.Login(services))
+	session.GET("/me", handlers.Me(services))
 }
